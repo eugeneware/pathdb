@@ -159,10 +159,10 @@ describe('pathdb', function() {
     function watch(err) {
       var obj;
       if (err) return done(err);
-      db.pathdb.watch(['people', 'cars'])
+      db.pathdb.watch(['people', 'cars'], [])
         .on('value', function (value) {
-          expect(value).to.be(undefined);
-          obj = {};
+          expect(value).to.eql([]);
+          obj = value;
           process.nextTick(put);
         })
         .on('change', function (changeset) {

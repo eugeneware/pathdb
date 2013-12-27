@@ -121,9 +121,15 @@ function children(db, key, cb) {
     });
 }
 
-function watch(db, key) {
+function watch(db, key, def) {
+  if (typeof def === 'undefined') {
+    def = {};
+  }
   var ee = new EventEmitter();
   db.pathdb.get(key, function (err, value) {
+    if (typeof value === 'undefined') {
+      value = def;
+    }
     ee.emit('value', value);
     db.on('batch', function (batch) {
       var relevant = batch.filter(function (item) {
