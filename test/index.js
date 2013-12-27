@@ -177,4 +177,28 @@ describe('pathdb', function() {
       db.pathdb.put(['people'], o, noop);
     }
   });
+
+  it('should be able to apply batch updates to a path', function(done) {
+    db = pathdb(db);
+    db.pathdb.put(['people'], { old: 'data', smelly: 'socks' }, batch);
+    function batch(err) {
+      if (err) return done(err);
+      db.pathdb.batch(['people'], [
+        { type: 'del', key: ['smelly'] },
+        { type: 'put', key: ['my', 'new'], value: 'data' },
+        { type: 'put', key: ['my', 'extra'], value: 'data' }
+      ], get);
+    }
+
+    function get(err) {
+      if (err) return done(err);
+      db.pathdb.get(['people'], check);
+    }
+
+    function check(err, data) {
+      if (err) return done(err);
+      expect(data).to.eql({ my: { extra: 'data', new: 'data' }, old: 'data' });
+      done();
+    }
+  });
 });

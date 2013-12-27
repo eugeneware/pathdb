@@ -15,7 +15,8 @@ function pathdb(db) {
       put: put.bind(null, db),
       get: get.bind(null, db),
       del: del.bind(null, db),
-      watch: watch.bind(null, db)
+      watch: watch.bind(null, db),
+      batch: batch.bind(null, db)
     };
   }
   return db;
@@ -153,4 +154,12 @@ function startsWith(haystack, prefix) {
     i++;
   }
   return (i === prefix.length)
+}
+
+function batch(db, key, data, cb) {
+  var _data = data.map(function (item) {
+    item.key = key.concat(item.key);
+    return item;
+  });
+  db.batch(_data, { keyEncoding: bytewise, valueEncoding: 'json' }, cb);
 }
