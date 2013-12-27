@@ -9,18 +9,10 @@ var expect = require('expect.js'),
 
 describe('pathdb', function() {
   var db, dbPath = path.join(__dirname, '..', 'data', 'testdb');
+  var o;
+
   beforeEach(function(done) {
-    rimraf.sync(dbPath);
-    db = level(dbPath, { keyEncoding: bytewise, valueEncoding: 'json' });
-    done();
-  });
-
-  afterEach(function(done) {
-    db.close(done);
-  });
-
-  it('should be able to serialize an object to the database', function(done) {
-    var o = {
+    o = {
       name: 'Eugene',
       number: 42,
       tags: ['tag1', 'tag2', 'tag3'],
@@ -35,6 +27,16 @@ describe('pathdb', function() {
         }
       ]
     };
+    rimraf.sync(dbPath);
+    db = level(dbPath, { keyEncoding: bytewise, valueEncoding: 'json' });
+    done();
+  });
+
+  afterEach(function(done) {
+    db.close(done);
+  });
+
+  it('should be able to serialize an object to the database', function(done) {
     db = pathdb(db);
     db.pathdb.put(o, get);
 
@@ -51,21 +53,6 @@ describe('pathdb', function() {
   });
 
   it('should be able to serialize an object at a path', function(done) {
-    var o = {
-      name: 'Eugene',
-      number: 42,
-      tags: ['tag1', 'tag2', 'tag3'],
-      cars: [
-        {
-          make: 'Toyota',
-          model: 'Camry'
-        },
-        {
-          make: 'Toyota',
-          model: 'Corolla'
-        }
-      ]
-    };
     db = pathdb(db);
     db.pathdb.put(['my', 'people'], o, get);
 
@@ -82,21 +69,6 @@ describe('pathdb', function() {
   });
 
   it('should be able to retrieve an object from the database', function(done) {
-    var o = {
-      name: 'Eugene',
-      number: 42,
-      tags: ['tag1', 'tag2', 'tag3'],
-      cars: [
-        {
-          make: 'Toyota',
-          model: 'Camry'
-        },
-        {
-          make: 'Toyota',
-          model: 'Corolla'
-        }
-      ]
-    };
     db = pathdb(db);
     db.pathdb.put(o, get);
 
@@ -113,21 +85,6 @@ describe('pathdb', function() {
   });
 
   it('should be able to query sub trees', function(done) {
-    var o = {
-      name: 'Eugene',
-      number: 42,
-      tags: ['tag1', 'tag2', 'tag3'],
-      cars: [
-        {
-          make: 'Toyota',
-          model: 'Camry'
-        },
-        {
-          make: 'Toyota',
-          model: 'Corolla'
-        }
-      ]
-    };
     db = pathdb(db);
     db.pathdb.put(o, get);
 
