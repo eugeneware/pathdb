@@ -119,14 +119,24 @@ function children(db, key, cb) {
 
 function watch(db, key) {
   var ee = new EventEmitter();
-  var loaded = false;
   db.pathdb.get(key, function (err, value) {
-    if (!err) ee.emit('value', value);
-    loaded = true;
+    ee.emit('value', value);
+    db.on('batch', function (batch) {
+      var relevant = batch.filter(function (item) {
+        return startsWith(item.key, key);
+      });
+      ee.emit('change', relevant);
+    });
   });
 
-  db.on('batch', function (batch) {
-    if (loaded) ee.emit('change', batch);
-  });
   return ee;
+}
+
+function startsWith(haystack, prefix) {
+  var i = 0;
+  while (i < haystack.length && i < prefix.length) {
+    if (prefix[i] !== haystack[i]) return false;
+    i++;
+  }
+  return (i === prefix.length)
 }

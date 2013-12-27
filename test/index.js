@@ -153,4 +153,30 @@ describe('pathdb', function() {
       db.pathdb.put(['people'], o, noop);
     }
   });
+
+  it('should be able to watch a subpath for changes', function(done) {
+    db = pathdb(db);
+    db.pathdb.put(['people'], { old: 'data' }, watch);
+
+    function watch(err) {
+      var obj;
+      if (err) return done(err);
+      db.pathdb.watch(['people', 'cars'])
+        .on('value', function (value) {
+          expect(value).to.be(undefined);
+          obj = {};
+          process.nextTick(put);
+        })
+        .on('change', function (changeset) {
+          diff.apply(changeset, obj, true);
+          expect(obj).to.eql({ people: { cars: o.cars } });
+          done();
+        })
+        .on('error', done);
+    }
+
+    function put(err) {
+      db.pathdb.put(['people'], o, noop);
+    }
+  });
 });
