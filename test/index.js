@@ -5,10 +5,12 @@ var expect = require('expect.js'),
     rimraf = require('rimraf'),
     pathos = require('pathos'),
     typewise = require('typewise'),
+    diff = require('changeset'),
     pathdb = require('..');
 
 describe('pathdb', function() {
   var db, dbPath = path.join(__dirname, '..', 'data', 'testdb');
+  function noop() {}
   var o;
 
   beforeEach(function(done) {
@@ -123,6 +125,32 @@ describe('pathdb', function() {
       expect(err.name).to.equal('NotFoundError');
       expect(data).to.be(undefined);
       done();
+    }
+  });
+
+  it('should be able to watch a path for changes', function(done) {
+    db = pathdb(db);
+    db.pathdb.put(['people'], { old: 'data' }, watch);
+
+    function watch(err) {
+      var obj;
+      if (err) return done(err);
+      db.pathdb.watch(['people'])
+        .on('value', function (value) {
+          expect(value).to.eql({ people: { old: 'data' } });
+          obj = value;
+          process.nextTick(put);
+        })
+        .on('change', function (changeset) {
+          diff.apply(changeset, obj, true);
+          expect(obj).to.eql({ people: o });
+          done();
+        })
+        .on('error', done);
+    }
+
+    function put(err) {
+      db.pathdb.put(['people'], o, noop);
     }
   });
 });

@@ -1,5 +1,6 @@
 var pathos = require('pathos'),
     bytewise = require('bytewise'),
+    EventEmitter = require('events').EventEmitter,
     createError   = require('errno').create
     LevelUPError  = createError('LevelUPError')
     NotFoundError = createError('NotFoundError', LevelUPError);
@@ -13,7 +14,8 @@ function pathdb(db) {
     db.pathdb = {
       put: put.bind(null, db),
       get: get.bind(null, db),
-      del: del.bind(null, db)
+      del: del.bind(null, db),
+      watch: watch.bind(null, db)
     };
   }
   return db;
@@ -113,4 +115,18 @@ function children(db, key, cb) {
     .on('end', function () {
       cb(null, batch);
     });
+}
+
+function watch(db, key) {
+  var ee = new EventEmitter();
+  var loaded = false;
+  db.pathdb.get(key, function (err, value) {
+    if (!err) ee.emit('value', value);
+    loaded = true;
+  });
+
+  db.on('batch', function (batch) {
+    if (loaded) ee.emit('change', batch);
+  });
+  return ee;
 }
