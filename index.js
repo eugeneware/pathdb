@@ -1,5 +1,11 @@
 var pathos = require('pathos'),
-    bytewise = require('bytewise');
+    bytewise = require('bytewise'),
+    createError   = require('errno').create
+    LevelUPError  = createError('LevelUPError')
+    NotFoundError = createError('NotFoundError', LevelUPError);
+
+NotFoundError.prototype.notFound = true;
+NotFoundError.prototype.status   = 404;
 
 module.exports = pathdb;
 function pathdb(db) {
@@ -48,8 +54,12 @@ function get(db, key, cb) {
       cb(err);
     })
     .on('end', function () {
-      var obj = pathos.build(result);
-      cb(null, obj);
+      if (result.length) {
+        var obj = pathos.build(result);
+        cb(null, obj);
+      } else {
+        cb(new NotFoundError('Path not found in database ' + JSON.stringify(key)));
+      }
     });
 }
 

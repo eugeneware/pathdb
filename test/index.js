@@ -116,7 +116,7 @@ describe('pathdb', function() {
 
     function get(err) {
       if (err) return done(err);
-      db.get(['people', 'cars', '1', 'make'], check);
+      db.pathdb.get(['people'], check);
     }
 
     function check(err, data) {

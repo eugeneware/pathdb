@@ -31,7 +31,8 @@
     "pathos": "0.1.0",
     "bytewise": "~0.7.0",
     "level": "~0.18.0",
-    "typewise": "~0.7.0"
+    "typewise": "~0.7.0",
+    "errno": "~0.1.0"
   },
   "devDependencies": {
     "expect.js": "~0.2.0",
