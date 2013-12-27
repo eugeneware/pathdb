@@ -97,12 +97,10 @@ describe('pathdb', function() {
 
     function check(err, data) {
       if (err) return done(err);
-      expect(data).to.eql({
-        cars: [
-          { make: 'Toyota', model: 'Camry' },
-          { make: 'Toyota', model: 'Corolla' },
-        ]
-      });
+      expect(data).to.eql([
+        { make: 'Toyota', model: 'Camry' },
+        { make: 'Toyota', model: 'Corolla' },
+      ]);
       done();
     }
   });
@@ -137,13 +135,13 @@ describe('pathdb', function() {
       if (err) return done(err);
       db.pathdb.watch(['people'])
         .on('value', function (value) {
-          expect(value).to.eql({ people: { old: 'data' } });
+          expect(value).to.eql({ old: 'data' });
           obj = value;
           process.nextTick(put);
         })
         .on('change', function (changeset) {
           diff.apply(changeset, obj, true);
-          expect(obj).to.eql({ people: o });
+          expect(obj).to.eql(o);
           done();
         })
         .on('error', done);
@@ -169,7 +167,7 @@ describe('pathdb', function() {
         })
         .on('change', function (changeset) {
           diff.apply(changeset, obj, true);
-          expect(obj).to.eql({ people: { cars: o.cars } });
+          expect(obj).to.eql(o.cars);
           done();
         })
         .on('error', done);

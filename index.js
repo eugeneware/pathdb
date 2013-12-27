@@ -67,7 +67,11 @@ function get(db, key, cb) {
     })
     .on('end', function () {
       if (result.length) {
-        var obj = pathos.build(result);
+        var leaves = result.map(function (item) {
+          item.key = item.key.slice(key.length);
+          return item;
+        });
+        var obj = pathos.build(leaves);
         cb(null, obj);
       } else {
         cb(new NotFoundError('Path not found in database ' + JSON.stringify(key)));
@@ -124,6 +128,10 @@ function watch(db, key) {
     db.on('batch', function (batch) {
       var relevant = batch.filter(function (item) {
         return startsWith(item.key, key);
+      })
+      .map(function (item) {
+        item.key = item.key.slice(key.length);
+        return item;
       });
       ee.emit('change', relevant);
     });
