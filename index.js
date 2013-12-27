@@ -26,15 +26,24 @@ function put(db, key, value, cb) {
     key = [];
   }
 
-  var paths = pathos(value);
-  var batch = paths.map(function (e) {
-    return {
-      type: 'put',
-      key: key.concat(e.key),
-      value: e.value
-    };
+  children(db, key, function (err, data) {
+    if (err) return cb(err);
+    var batch = data.map(function (k) {
+      return {
+        type: 'del',
+        key: k,
+      };
+    });
+    var paths = pathos(value);
+    paths.forEach(function (e) {
+      batch.push({
+        type: 'put',
+        key: key.concat(e.key),
+        value: e.value
+      });
+    });
+    db.batch(batch, { keyEncoding: bytewise, valueEncoding: 'json' }, cb);
   });
-  db.batch(batch, { keyEncoding: bytewise, valueEncoding: 'json' }, cb);
 }
 
 function get(db, key, cb) {
@@ -70,6 +79,24 @@ function del(db, key, cb) {
     key = [];
   }
 
+  children(db, key, function (err, data) {
+    if (err) return cb(err);
+    var batch = data.map(function (k) {
+      return {
+        type: 'del',
+        key: k
+      };
+    });
+    db.batch(batch, cb);
+  });
+}
+
+function children(db, key, cb) {
+  if (typeof cb === 'undefined') {
+    cb = key;
+    key = [];
+  }
+
   var batch = []
   db.createReadStream({
       keyEncoding: bytewise,
@@ -78,12 +105,12 @@ function del(db, key, cb) {
       start: key.concat(null), end: key.concat(undefined)
     })
     .on('data', function (key) {
-      batch.push({ type: 'del', key: key });
+      batch.push(key);
     })
     .on('error', function (err) {
       cb(err);
     })
     .on('end', function () {
-      db.batch(batch, cb);
+      cb(null, batch);
     });
 }
