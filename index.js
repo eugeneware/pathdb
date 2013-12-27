@@ -6,7 +6,8 @@ function pathdb(db) {
   if (db && !db.pathdb) {
     db.pathdb = {
       put: put.bind(null, db),
-      get: get.bind(null, db)
+      get: get.bind(null, db),
+      del: del.bind(null, db)
     };
   }
   return db;
@@ -49,5 +50,29 @@ function get(db, key, cb) {
     .on('end', function () {
       var obj = pathos.build(result);
       cb(null, obj);
+    });
+}
+
+function del(db, key, cb) {
+  if (typeof cb === 'undefined') {
+    cb = key;
+    key = [];
+  }
+
+  var batch = []
+  db.createReadStream({
+      keyEncoding: bytewise,
+      keys: true,
+      values: false,
+      start: key.concat(null), end: key.concat(undefined)
+    })
+    .on('data', function (key) {
+      batch.push({ type: 'del', key: key });
+    })
+    .on('error', function (err) {
+      cb(err);
+    })
+    .on('end', function () {
+      db.batch(batch, cb);
     });
 }

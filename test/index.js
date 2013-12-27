@@ -104,4 +104,25 @@ describe('pathdb', function() {
       done();
     }
   });
+
+  it('should be able to delete objects', function(done) {
+    db = pathdb(db);
+    db.pathdb.put(['people'], o, del);
+
+    function del(err) {
+      if (err) return done(err);
+      db.pathdb.del(['people'], get);
+    }
+
+    function get(err) {
+      if (err) return done(err);
+      db.get(['people', 'cars', '1', 'make'], check);
+    }
+
+    function check(err, data) {
+      expect(err.name).to.equal('NotFoundError');
+      expect(data).to.be(undefined);
+      done();
+    }
+  });
 });
