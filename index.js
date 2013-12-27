@@ -45,6 +45,7 @@ function get(db, key, cb) {
 
   var result = []
   db.createReadStream({
+      keyEncoding: bytewise, valueEncoding: 'json',
       start: key.concat(null), end: key.concat(undefined)
     })
     .on('data', function (data) {
