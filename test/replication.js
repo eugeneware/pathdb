@@ -6,6 +6,8 @@ var expect = require('expect.js'),
     diff = require('changeset'),
     clone = require('clone'),
     after = require('after'),
+    observejs = require('observejs'),
+    through2 = require('through2'),
     pathdb = require('..');
 
 describe('pathdb', function() {
@@ -122,6 +124,27 @@ describe('pathdb', function() {
       expect(obj).to.eql(expected);
       expect(obj2).to.eql(expected);
       expect(obj).to.eql(obj2);
+      done();
+    }
+  });
+
+  it('should be able to detect changes', function(done) {
+    var next = after(2, check);
+    var batch = [];
+    observejs.observe(o).pipe(through2({ objectMode: true },
+      function (chunk, enc, cb) {
+        batch.push(chunk);
+        next();
+        cb();
+      }));
+    o.name = 'Susan';
+    o.number = 21;
+
+    function check() {
+      expect(batch).to.eql([
+        { type: 'put', key: [ 'name' ], value: 'Susan' },
+        { type: 'put', key: [ 'number' ], value: 21 }
+      ]);
       done();
     }
   });

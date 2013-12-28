@@ -45,6 +45,8 @@
     "grunt-complexity": "~0.1.3",
     "grunt-cli": "~0.1.9",
     "rimraf": "~2.2.5",
-    "after": "~0.8.1"
+    "after": "~0.8.1",
+    "observejs": "0.0.2",
+    "through2": "~0.2.3"
   }
 }
