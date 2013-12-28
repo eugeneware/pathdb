@@ -33,7 +33,8 @@
     "level": "~0.18.0",
     "typewise": "~0.7.0",
     "errno": "~0.1.0",
-    "changeset": "0.0.6"
+    "changeset": "0.0.6",
+    "clone": "~0.1.11"
   },
   "devDependencies": {
     "expect.js": "~0.2.0",
@@ -43,6 +44,7 @@
     "grunt-mocha-cli": "~1.1.0",
     "grunt-complexity": "~0.1.3",
     "grunt-cli": "~0.1.9",
-    "rimraf": "~2.2.5"
+    "rimraf": "~2.2.5",
+    "after": "~0.8.1"
   }
 }

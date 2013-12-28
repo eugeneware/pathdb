@@ -1,5 +1,6 @@
 var pathos = require('pathos'),
     bytewise = require('bytewise'),
+    clone = require('clone'),
     EventEmitter = require('events').EventEmitter,
     createError   = require('errno').create
     LevelUPError  = createError('LevelUPError')
@@ -137,8 +138,10 @@ function watch(db, key, def) {
         return startsWith(item.key, key);
       })
       .map(function (item) {
-        item.key = item.key.slice(key.length);
-        return item;
+        // don't change the batch data which is shared on 'batch' events
+        var _item = clone(item);
+        _item.key = _item.key.slice(key.length);
+        return _item;
       });
       ee.emit('change', relevant);
     });
