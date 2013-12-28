@@ -45,6 +45,7 @@
     "rimraf": "~2.2.5",
     "after": "~0.8.1",
     "observejs": "0.0.2",
-    "through2": "~0.2.3"
+    "through2": "~0.2.3",
+    "bytewise": "~0.7.0"
   }
 }
