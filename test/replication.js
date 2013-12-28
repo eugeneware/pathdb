@@ -128,23 +128,41 @@ describe('pathdb', function() {
     }
   });
 
-  it('should be able to detect changes', function(done) {
-    var next = after(2, check);
-    var batch = [];
-    observejs.observe(o).pipe(through2({ objectMode: true },
-      function (chunk, enc, cb) {
-        batch.push(chunk);
-        next();
-        cb();
-      }));
-    o.name = 'Susan';
-    o.number = 21;
+  it('should be able to replicate changes using observejs', function(done) {
+    db = pathdb(db);
+    db.pathdb.put(['people'], o, change);
 
-    function check() {
+    var batch = [];
+    function change(err) {
+      if (err) return done(err);
+      var next = after(2, sync);
+      observejs.observe(o).pipe(through2({ objectMode: true },
+        function (chunk, enc, cb) {
+          batch.push(chunk);
+          next();
+          cb();
+        }));
+      o.name = 'Susan';
+      o.number = 21;
+    }
+
+    function sync() {
       expect(batch).to.eql([
         { type: 'put', key: [ 'name' ], value: 'Susan' },
         { type: 'put', key: [ 'number' ], value: 21 }
       ]);
+      db.pathdb.batch(['people'], batch, get);
+    }
+
+    function get(err) {
+      if (err) return done(err);
+      db.pathdb.get(['people'], check);
+    }
+
+    function check(err, data) {
+      if (err) return done(err);
+      expect(o.name).to.equal('Susan');
+      expect(o.number).to.equal(21);
       done();
     }
   });
