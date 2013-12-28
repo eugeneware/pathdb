@@ -1,5 +1,4 @@
 var pathos = require('pathos'),
-    bytewise = require('bytewise'),
     clone = require('clone'),
     EventEmitter = require('events').EventEmitter,
     createError   = require('errno').create
@@ -46,7 +45,7 @@ function put(db, key, value, cb) {
         value: e.value
       });
     });
-    db.batch(batch, { keyEncoding: bytewise, valueEncoding: 'json' }, cb);
+    db.batch(batch, cb);
   });
 }
 
@@ -58,7 +57,6 @@ function get(db, key, cb) {
 
   var result = []
   db.createReadStream({
-      keyEncoding: bytewise, valueEncoding: 'json',
       start: key.concat(null), end: key.concat(undefined)
     })
     .on('data', function (data) {
@@ -107,7 +105,6 @@ function children(db, key, cb) {
 
   var batch = []
   db.createReadStream({
-      keyEncoding: bytewise,
       keys: true,
       values: false,
       start: key.concat(null), end: key.concat(undefined)
@@ -164,5 +161,5 @@ function batch(db, key, data, cb) {
     item.key = key.concat(item.key);
     return item;
   });
-  db.batch(_data, { keyEncoding: bytewise, valueEncoding: 'json' }, cb);
+  db.batch(_data, cb);
 }
