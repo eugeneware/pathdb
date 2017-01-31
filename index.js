@@ -3,7 +3,8 @@ var pathos = require('pathos'),
     EventEmitter = require('events').EventEmitter,
     createError   = require('errno').create
     LevelUPError  = createError('LevelUPError')
-    NotFoundError = createError('NotFoundError', LevelUPError);
+    NotFoundError = createError('NotFoundError', LevelUPError),
+    Deferred = require('deferential');
 
 NotFoundError.prototype.notFound = true;
 NotFoundError.prototype.status   = 404;
@@ -23,14 +24,19 @@ function pathdb(db) {
 }
 
 function put(db, key, value, cb) {
-  if (typeof cb === 'undefined') {
+  if (typeof cb === 'undefined' &&
+      typeof value === 'function' ||
+      typeof value === 'undefined') {
     cb = value;
     value = key;
     key = [];
   }
 
+  var d = Deferred();
+  var resolver = d.resolver();
+
   children(db, key, function (err, data) {
-    if (err) return cb(err);
+    if (err) return resolver(err);
     var batch = data.map(function (k) {
       return {
         type: 'del',
@@ -45,15 +51,22 @@ function put(db, key, value, cb) {
         value: e.value
       });
     });
-    db.batch(batch, cb);
+    db.batch(batch, resolver);
   });
+
+  return d.nodeify(cb);
 }
 
 function get(db, key, cb) {
-  if (typeof cb === 'undefined') {
+  if (typeof cb === 'undefined' &&
+      typeof key === 'function' ||
+      typeof key === 'undefined') {
     cb = key;
     key = [];
   }
+
+  var d = Deferred();
+  var resolver = d.resolver();
 
   var result = []
   db.createReadStream({
@@ -62,39 +75,48 @@ function get(db, key, cb) {
     .on('data', function (data) {
       result.push(data);
     })
-    .on('error', function (err) {
-      cb(err);
+    .once('error', function (err) {
+      resolver(err);
     })
-    .on('end', function () {
+    .once('end', function () {
       if (result.length) {
         var leaves = result.map(function (item) {
           item.key = item.key.slice(key.length);
           return item;
         });
         var obj = pathos.build(leaves);
-        cb(null, obj);
+        resolver(null, obj);
       } else {
-        cb(new NotFoundError('Path not found in database ' + JSON.stringify(key)));
+        resolver(new NotFoundError('Path not found in database ' + JSON.stringify(key)));
       }
     });
+
+  return d.nodeify(cb);
 }
 
 function del(db, key, cb) {
-  if (typeof cb === 'undefined') {
+  if (typeof cb === 'undefined' &&
+      typeof key === 'function' ||
+      typeof key === 'undefined') {
     cb = key;
     key = [];
   }
 
+  var d = Deferred();
+  var resolver = d.resolver();
+
   children(db, key, function (err, data) {
-    if (err) return cb(err);
+    if (err) return resolver(err);
     var batch = data.map(function (k) {
       return {
         type: 'del',
         key: k
       };
     });
-    db.batch(batch, cb);
+    db.batch(batch, resolver);
   });
+
+  return d.nodeify(cb);
 }
 
 function children(db, key, cb) {
@@ -112,10 +134,10 @@ function children(db, key, cb) {
     .on('data', function (key) {
       batch.push(key);
     })
-    .on('error', function (err) {
+    .once('error', function (err) {
       cb(err);
     })
-    .on('end', function () {
+    .once('end', function () {
       cb(null, batch);
     });
 }
@@ -157,9 +179,22 @@ function startsWith(haystack, prefix) {
 }
 
 function batch(db, key, data, cb) {
+  if (typeof cb === 'undefined' &&
+      typeof data === 'function' ||
+      typeof data === 'undefined') {
+    cb = data;
+    data = key;
+    key = [];
+  }
+
+  var d = Deferred();
+  var resolver = d.resolver();
+
   var _data = data.map(function (item) {
     item.key = key.concat(item.key);
     return item;
   });
-  db.batch(_data, cb);
+  db.batch(_data, resolver);
+
+  return d.nodeify(cb);
 }

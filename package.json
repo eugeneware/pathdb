@@ -30,6 +30,7 @@
   "dependencies": {
     "changeset": "^0.2.1",
     "clone": "^0.1.11",
+    "deferential": "^1.0.0",
     "errno": "^0.1.0",
     "pathos": "^2.0.0"
   },
@@ -38,6 +39,7 @@
     "bytewise": "^1.1.0",
     "expect.js": "^0.3.1",
     "level": "^1.5.0",
+    "level-promise": "^2.1.1",
     "mocha": "^3.2.0",
     "observejs": "^0.0.2",
     "rimraf": "^2.5.4",
