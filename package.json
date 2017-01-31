@@ -4,7 +4,7 @@
   "description": "Database built on levelup/leveldb that stores javascript objects as a series of paths and values.",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/.bin/grunt ci"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -36,16 +36,11 @@
   "devDependencies": {
     "level": "~0.18.0",
     "expect.js": "~0.2.0",
-    "grunt-contrib-jshint": "~0.6.4",
-    "grunt-contrib-watch": "~0.5.3",
-    "grunt": "~0.4.1",
-    "grunt-mocha-cli": "~1.1.0",
-    "grunt-complexity": "~0.1.3",
-    "grunt-cli": "~0.1.9",
     "rimraf": "~2.2.5",
     "after": "~0.8.1",
     "observejs": "0.0.2",
     "through2": "~0.2.3",
     "bytewise": "~0.7.0"
+    "mocha": "^3.2.0",
   }
 }
