@@ -62,13 +62,13 @@ becomes:
 var paths =
   [ { key: [ 'name' ], value: 'Eugene' },
     { key: [ 'number' ], value: 42 },
-    { key: [ 'tags', '0' ], value: 'tag1' },
-    { key: [ 'tags', '1' ], value: 'tag2' },
-    { key: [ 'tags', '2' ], value: 'tag3' },
-    { key: [ 'cars', '0', 'make' ], value: 'Toyota' },
-    { key: [ 'cars', '0', 'model' ], value: 'Camry' },
-    { key: [ 'cars', '1', 'make' ], value: 'Toyota' },
-    { key: [ 'cars', '1', 'model' ], value: 'Corolla' } ];
+    { key: [ 'tags', 0 ], value: 'tag1' },
+    { key: [ 'tags', 1 ], value: 'tag2' },
+    { key: [ 'tags', 2 ], value: 'tag3' },
+    { key: [ 'cars', 0, 'make' ], value: 'Toyota' },
+    { key: [ 'cars', 0, 'model' ], value: 'Camry' },
+    { key: [ 'cars', 1, 'make' ], value: 'Toyota' },
+    { key: [ 'cars', 1, 'model' ], value: 'Corolla' } ];
 ```
 
 It does this using the [pathos](https://github.com/eugeneware/pathos) library.
@@ -142,7 +142,7 @@ db.pathdb.put(['people'], o, cb);
 db.pathdb.get(['people'], cb);
 
 // fetch one of the child properties (will return 'Toyota')
-db.get(['people', 'cars', '1', 'make'], cb);
+db.get(['people', 'cars', 1, 'make'], cb);
 
 // delete the object
 db.pathdb.del(['people'], cb);
@@ -258,9 +258,74 @@ for examples of using this method for replication in conjunction with the
 [changeset](https://github.com/eugeneware/changeset) and
 [observejs](https://github.com/eugeneware/observejs) modules.
 
+## Promise API
+
+All the methods also return a `Promise`. Simply don't provide a callback parameter
+and the method will return a promise instead.
+
+Eg:
+
+``` js
+var pathdb = require('pathdb'),
+    levelPromise = require('level-promise'), // add promises to level db instance
+    level = require('level'),
+    bytewise = require('bytewise');
+
+// db will be a levelup instance that has a 'pathdb' property with additional
+// pathdb methods.
+
+var db = pathdb(levelPromise(level('/my/db',
+  { keyEncoding: bytewise, valueEncoding 'json'})));
+
+// object to store
+var person = {
+  name: 'Eugene',
+  number: 42,
+  tags: ['tag1', 'tag2', 'tag3'],
+  cars: [
+    {
+      make: 'Toyota',
+      model: 'Camry'
+    },
+    {
+      make: 'Toyota',
+      model: 'Corolla'
+    }
+  ]
+};
+
+// store the object under the 'people' property
+db.pathdb.put(['people'], o)
+  .then(function () {
+    console.log('success');
+  })
+  .catch(console.error);
+
+// retrieve the stored object
+db.pathdb.get(['people'])
+  .then(function (data) {
+    console.log(data);
+  })
+  .catch(console.error);
+
+// fetch one of the child properties (will return 'Toyota')
+db.get(['people', 'cars', 1, 'make'])
+  .then(function (data) {
+    console.log(data);
+  })
+  .catch(console.error);
+
+// delete the object
+db.pathdb.del(['people'])
+  .then(function () {
+    console.log('success');
+  })
+  .catch(console.error);
+```
+
 ## License
 
-### Copyright (c) 2013, Eugene Ware
+### Copyright (c) 2016, Eugene Ware
 #### All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
