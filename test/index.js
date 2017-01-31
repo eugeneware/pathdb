@@ -42,7 +42,7 @@ describe('pathdb', function() {
 
     function get(err) {
       if (err) return done(err);
-      db.get([ 'cars', '1', 'make' ], check);
+      db.get([ 'cars', 1, 'make' ], check);
     }
 
     function check(err, data) {
@@ -58,7 +58,7 @@ describe('pathdb', function() {
 
     function get(err) {
       if (err) return done(err);
-      db.get(['my', 'people', 'cars', '1', 'make'], check);
+      db.get(['my', 'people', 'cars', 1, 'make'], check);
     }
 
     function check(err, data) {
@@ -138,7 +138,7 @@ describe('pathdb', function() {
           process.nextTick(put);
         })
         .on('change', function (changeset) {
-          diff.apply(changeset, obj, true);
+          obj = diff.apply(changeset, obj, true);
           expect(obj).to.eql(o);
           done();
         })
@@ -164,7 +164,7 @@ describe('pathdb', function() {
           process.nextTick(put);
         })
         .on('change', function (changeset) {
-          diff.apply(changeset, obj, true);
+          obj = diff.apply(changeset, obj, true);
           expect(obj).to.eql(o.cars);
           done();
         })
