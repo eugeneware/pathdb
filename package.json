@@ -1,6 +1,6 @@
 {
   "name": "pathdb",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Database built on levelup/leveldb that stores javascript objects as a series of paths and values.",
   "main": "index.js",
   "scripts": {
