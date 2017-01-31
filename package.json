@@ -28,7 +28,7 @@
     "url": "https://github.com/eugeneware/pathdb/issues"
   },
   "dependencies": {
-    "changeset": "^0.1.0",
+    "changeset": "^0.2.1",
     "clone": "^0.1.11",
     "errno": "^0.1.0",
     "pathos": "^2.0.0"

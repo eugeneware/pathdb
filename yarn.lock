@@ -168,12 +168,12 @@ changeset@0.0.5:
   dependencies:
     underscore "~1.4.4"
 
-changeset@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/changeset/-/changeset-0.1.0.tgz#4a0a7d4480c2c941eb4b6cf1a0dddc1286677811"
+changeset@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/changeset/-/changeset-0.2.1.tgz#24853654623645865f5b74de1ae452e6e7e4ce51"
   dependencies:
     udc "^1.0.0"
-    underscore "~1.4.4"
+    underscore "^1.8.3"
 
 clone@^0.1.11:
   version "0.1.19"
@@ -1189,6 +1189,10 @@ typewise@^1.0.3:
 udc@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/udc/-/udc-1.0.1.tgz#c5e62448acf35eaa524d5c3698c863a5bac46bfc"
+
+underscore@^1.8.3:
+  version "1.8.3"
+  resolved "https://registry.yarnpkg.com/underscore/-/underscore-1.8.3.tgz#4f3fb53b106e6097fcf9cb4109f2a5e9bdfa5022"
 
 underscore@~1.4.4:
   version "1.4.4"
